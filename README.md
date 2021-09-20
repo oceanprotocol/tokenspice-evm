@@ -36,22 +36,15 @@ History: TokenSPICE was [initially built to model](https://github.com/tokenspice
 
 Open a new terminal and:
 ```console
-#ensure brownie's *not* installed. It causes problems
-pip uninstall eth-brownie
-
 #clone repo
 git clone https://github.com/oceanprotocol/tokenspice.git tokenspice
 cd tokenspice
 
-#make sure we're not in env't; remove old env'ts
-conda deactivate
-conda remove --name tokenspiceenv --all
+#create a virtual environment using pipenv and install dependencies
+pipenv install
 
-#create a python-anaconda env't in location ~/anaconda3/envs/tokenspiceenv
-conda env create -f environment.yml
-
-#activate env't
-conda activate tokenspiceenv
+#activate environment shell
+pipenv shell
 ```
 
 ## Get Ganache running
@@ -66,7 +59,7 @@ Open a new terminal and:
 cd tokenspice
 
 #activate env't
-conda activate tokenspiceenv
+pipenv shell
 
 #run ganache
 ./ganache.py
@@ -106,7 +99,7 @@ Finally, open `tokenspice/tokenspice.ini` and set `ARTIFACTS_PATH = contracts/ar
 ## Test one EVM-based test
 
 ```console
-conda activate tokenspiceenv
+pipenv shell
 pytest web3engine/test/test_btoken.py 
 ```
 
@@ -165,7 +158,7 @@ npm run deploy
 **Update simulation code.** Open a new terminal. In it:
 ```console
 cd ~/code/tokenspice
-conda activate tokenspiceenv
+pipenv shell
 
 #then use editor to change assets/netlists/foo.py
 ```
@@ -194,7 +187,7 @@ mypy --config-file mypy.ini ./
 ## Test that everything is working
 
 ```console
-conda activate tokenspiceenv
+pipenv shell
 pytest
 ```
 
@@ -249,25 +242,22 @@ Existing netlists include:
 
 You don't need this info at the beginning, but it's good to know about as you make changes.
 
-To change dependencies, first update `environment.yml`. Then:
+To change dependencies,
 ```console
 #make sure env't is active
-conda activate tokenspiceenv
-
-#main update. The 'prune' part gets rid of unused pkgs
-conda env update --name tokenspiceenv --file environment.yml --prune
+pipenv shell
 ```
-
-Leave environment:
+Make installs and unistalls using `pipenv`
 ```console
-conda deactivate
+#Install
+pipenv install package-name
+#Uninstall
+pipenv uninstall package-name
 ```
-
-Delete environment:
+Update requirements.txt:
 ```console
-conda remove --name tokenspiceenv --all
+pipenv lock -r > requirements.txt
 ```
-
 
 # 🐡 Backlog
 
