@@ -1,0 +1,38 @@
+name: MyPy Static Typechecking
+
+on:
+  push:
+    branches: [ action_tests ]
+  pull_request:
+    branches: [ action_tests ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [ 3.8, 3.9 ]
+
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python {{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest numpy
+          if [ -f requirements.txt ]; 
+            then pip install -r requirements.txt; 
+            echo "Requirements.txt found!"
+          fi
+          
+      - name: Run MyPy
+        run: |
+          mypy --config-file mypy.ini ./

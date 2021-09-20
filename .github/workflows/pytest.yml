@@ -1,0 +1,84 @@
+name: Unit Testing
+
+on:
+  push:
+    branches: [ action_tests ]
+  pull_request:
+    branches: [ action_tests ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [ 3.8, 3.9 ]
+
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python {{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Ganache-CLI
+        run: npm install ganache-cli --global
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest numpy
+          if [ -f requirements.txt ]; 
+            then pip install -r requirements.txt; 
+            echo "Requirements.txt found!"
+          fi
+          
+      - name: Find out what the directory structure looks like
+        run: |
+          pwd
+          tree
+
+          
+      - name: Executing Python Ganache script
+        run: |
+          nohup python3 ganache.py
+
+      - name: Check Node version on this machine.
+        run: |
+          node -v
+
+      - name: Making a Directory for Ocean Protocol Repo
+        run: |
+          mkdir contracts 
+
+      - name: Clone Ocean Protocol Contracts
+        uses: actions/checkout@master
+        with:
+          repository: JohannSuarez/contracts
+          path: contracts
+
+      - name: Deploy Contracts to Ganache
+        run: |
+          cd contracts
+          npm i
+          npm run deploy
+
+      - name: Check Current directory after installing and deploying contracts
+        run: |
+          pwd
+          tree
+
+      - name: Trying to print contracts/setup.cfg
+        run: |
+          cat contracts/setup.cfg
+
+      - name: Run Pytest (Just one test)
+        run: |
+          pytest assets/agents/test/test_DataconsumerAgent.py
+
+      - name: Run Entire Suite of Tests 
+        run: |
+          pytest
